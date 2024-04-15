@@ -1,4 +1,4 @@
-package com.example.gozlebrowser.presentation.fragment
+package com.example.gozlebrowser.presentation.searchPage
 
 import android.annotation.SuppressLint
 import android.app.DownloadManager
@@ -9,7 +9,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -25,13 +27,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.gozlebrowser.R
 import com.example.gozlebrowser.databinding.FragmentSearchBinding
+import com.example.gozlebrowser.presentation.qrPage.QRFragment
 import com.example.gozlebrowser.util.DetectConnection.checkInternetConnection
 import com.example.gozlebrowser.util.KeyboardHelper
 
 
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(){
     private var _binding: FragmentSearchBinding? = null
-    private val binding: FragmentSearchBinding
+    val binding: FragmentSearchBinding
         get() = _binding ?: throw RuntimeException("FragmentSearchBinding == null")
 
     var baseUrl = ""
@@ -91,9 +94,8 @@ class SearchFragment : Fragment() {
             //remove error connection message
             binding.webView.apply {
                 visibility = View.VISIBLE
-                setBackgroundColor(resources.getColor(R.color.my_primary));
-                webChromeClient = WebChromeClient()
-                webViewClient = GozleWebViewClient()
+                setBackgroundColor(resources.getColor(R.color.my_primary))
+                webViewClient = MyWebViewClient()
                 settings.domStorageEnabled = true
                 settings.allowContentAccess = true
                 settings.setSupportZoom(true)
@@ -101,11 +103,25 @@ class SearchFragment : Fragment() {
                 settings.displayZoomControls = false
                 webChromeClient = MyWebChromeClient()
 
+
+                binding.webView.canGoBack()
+                binding.webView.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+                    if (event.action == KeyEvent.ACTION_DOWN) {
+                        if (binding.webView.canGoBack()){
+                            binding.webView.goBack()
+                        }else{
+                            requireActivity().onBackPressed()
+                        }
+                    }
+                    return@OnKeyListener true
+                })
+
                 when {
                     URLUtil.isValidUrl(baseUrl) -> loadUrl(baseUrl)
                     baseUrl.contains(".com", ignoreCase = true) -> loadUrl(baseUrl)
                     else -> loadUrl("https://www.google.com/search?q=$baseUrl")
                 }
+
 
                 requireActivity().title = baseUrl;
                 loadUrl(baseUrl)
@@ -203,73 +219,13 @@ class SearchFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-    inner class GozleWebViewClient : WebViewClient() {
-        override fun shouldOverrideUrlLoading(
-            view: WebView?,
-            request: WebResourceRequest?
-        ): Boolean {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val urlStr = request?.url?.toString() ?: ""
-                if (urlStr.contains(baseUrl)) {
-                    return false
-                } else {
-                    /*                    val address = Uri.parse(urlStr)
-                    val openlink = Intent(Intent.ACTION_VIEW, address)
-                    startActivity(Intent.createChooser(openlink, "Browser"))*/
-                    // открывает сразу в браузере по умолчанию
-                    if (urlStr.contains(yandexMapUrl) || urlStr.contains(yandexMapUrl2)) {
-                        try {
-                            val appMapIntent = Intent(Intent.ACTION_VIEW)
-                            appMapIntent.data = Uri.parse(urlStr)
-                            startActivity(appMapIntent)
-                        } catch (e: Exception) {
-                            Log.d("logUrl", " e = $e")
-                            val split = urlStr.split("browser_fallback_url=")
-                            val url = split[split.lastIndex]
-                            val webIntent = Intent(Intent.ACTION_VIEW)
-                            webIntent.data = Uri.parse(url)
-                            startActivity(webIntent)
-                        }
-                        return true
-                    } else {
-                        val webIntent = Intent(Intent.ACTION_VIEW)
-                        webIntent.data = Uri.parse(urlStr)
-                        startActivity(webIntent)
-                        return true
-                    }
-                }
-            }
-            return super.shouldOverrideUrlLoading(view, request)
-        }
 
-        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-            return if (url?.contains(baseUrl) == true) {
-                false
-            } else {
-                // открывает сразу в браузере по умолчанию
-                if (url?.contains(yandexMapUrl) == true || url?.contains(yandexMapUrl2) == true) {
-                    try {
-                        val appMapIntent = Intent(Intent.ACTION_VIEW)
-                        appMapIntent.data = Uri.parse(url)
-                        startActivity(appMapIntent)
-                    } catch (e: Exception) {
-                        val split = url.split("browser_fallback_url=")
-                        val urlCur = split[split.lastIndex]
-                        val webIntent = Intent(Intent.ACTION_VIEW)
-                        webIntent.data = Uri.parse(urlCur)
-                        startActivity(webIntent)
-                    }
-                    return true
-                } else {
-                    val webIntent = Intent(Intent.ACTION_VIEW)
-                    webIntent.data = Uri.parse(url)
-                    startActivity(webIntent)
-                    return true
-                }
-            }
+    class MyWebViewClient : WebViewClient() {
+        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+            // Do not open new browser to load new link, load them in this webview
+            return false
         }
     }
-
     internal inner class MyWebChromeClient : WebChromeClient() {
         fun openFileChooser(uploadMsg: ValueCallback<Uri>, acceptType: String) {
             mUploadMessage = uploadMsg
@@ -358,7 +314,6 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-
         private const val REQUEST_SELECT_FILE = 100
         private const val FILE_CHOOSER_RESULT_CODE = 1
     }

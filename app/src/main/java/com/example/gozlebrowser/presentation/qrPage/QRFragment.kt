@@ -1,4 +1,4 @@
-package com.example.gozlebrowser.presentation.fragment
+package com.example.gozlebrowser.presentation.qrPage
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.gozlebrowser.databinding.FragmentQrBinding
-import com.example.gozlebrowser.databinding.FragmentSearchBinding
 
 class QRFragment : Fragment() {
     private var _binding: FragmentQrBinding? = null
