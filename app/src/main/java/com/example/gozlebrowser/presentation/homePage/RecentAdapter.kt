@@ -1,4 +1,4 @@
-package com.example.gozlebrowser.presentation.adapters
+package com.example.gozlebrowser.presentation.homePage
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.ListAdapter
 import com.example.gozlebrowser.databinding.ItemRecentlyBinding
 import com.example.gozlebrowser.domain.model.Recent
-import com.squareup.picasso.Picasso
 
 class RecentAdapter(private val context: Context) :
     ListAdapter<Recent, RecentViewHolder>(RecentDiffCallback) {

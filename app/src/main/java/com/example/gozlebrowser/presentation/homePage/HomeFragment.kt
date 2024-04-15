@@ -1,4 +1,4 @@
-package com.example.gozlebrowser.presentation.fragment
+package com.example.gozlebrowser.presentation.homePage
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment
 import com.example.gozlebrowser.R
 import com.example.gozlebrowser.databinding.FragmentHomeBinding
 import com.example.gozlebrowser.domain.model.Recent
-import com.example.gozlebrowser.presentation.adapters.RecentAdapter
+import com.example.gozlebrowser.presentation.qrPage.QRFragment
+import com.example.gozlebrowser.presentation.searchPage.SearchFragment
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null

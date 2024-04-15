@@ -1,4 +1,4 @@
-package com.example.gozlebrowser.presentation.adapters
+package com.example.gozlebrowser.presentation.homePage
 import androidx.recyclerview.widget.DiffUtil
 import com.example.gozlebrowser.domain.model.Recent
 

@@ -8,7 +8,7 @@
     android:focusableInTouchMode="true"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".presentation.fragment.SearchFragment">
+    tools:context=".presentation.searchPage.SearchFragment">
 
     <WebView
         android:id="@+id/webView"
